@@ -1,0 +1,13 @@
+Package: MVnormS21
+Type: Package
+Title: Check Multivariate Normality
+Version: 0.1.0
+Author: Sophie Huebler
+Maintainer: Sophie Huebler <shuebler@ou.edu>
+Description: Use this package to check multivariate normality.
+License: MIT
+Encoding: UTF-8
+LazyData: true
+Imports:
+  shiny
+RoxygenNote: 7.1.1
