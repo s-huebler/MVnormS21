@@ -8,9 +8,9 @@ Description: Use this package to check multivariate normality.
 License: MIT
 Encoding: UTF-8
 LazyData: true
-Imports:
-  shiny
-  shinyjs
 RoxygenNote: 7.1.1
 URL: https://github.com/s-huebler/MVnormS21
 BugReports: https://github.com/s-huebler/MVnormS21/issues
+Imports:
+  shiny,
+  shinyjs
