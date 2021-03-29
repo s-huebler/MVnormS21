@@ -107,11 +107,13 @@ ui<-fluidPage(
                                   choices = c("x1", "x2", "x3", "x4", "dsq")),
                      textInput("alpha",
                                "Pick an alpha value",
-                               value="0")
+                               value="0.05")
 
               ),
               column(9,
                      uiOutput("task3"),
+                     plotOutput("ellipsePlot"),
+                     plotOutput("chiPlots")
               )
             )#End fluid row
   ) #End tab 3
@@ -349,6 +351,8 @@ observe({
 
 })
 
+
+
 observe({
 
   temp<-as.vector(newNames())
@@ -360,11 +364,82 @@ v3x <- reactive({
   input$vars3x
 })
 
-v3x <- reactive({
+v3y <- reactive({
   input$vars3y
 })
 
 # Task 3 Output ----
+
+output$task3 <- renderUI({
+
+  title <- "Visualizing Bivariate Normality"
+
+  exp <- paste(
+    "We can look at the spread of two seperate variables to visually assess
+    bivariate normality. Choose an alpha value to see the ellipse that
+    encloses 1-alpha % of the data. If the data is normally distributed, we
+    expect the points to be equally scattered within the ellipse.", sep= " "
+  )
+
+  HTML( "<span style='font-size:150%'>", title, "</span>","<br>" ,
+        "<span style='font-size:80%'>", exp)
+
+})
+
+alpha <- reactive({
+  input$alpha
+})
+
+output$ellipsePlot <- renderPlot({
+  df <- datNum()
+  v3x<-v3x()
+  v3y <- v3y()
+  alpha <- as.numeric(alpha())
+
+  if(input$data=="Upload_Your_Own"){
+    req(input$file)
+  }
+
+  req(input$alpha)
+
+  if(is.element(v3x, newNames()) & !identical(v3x, v3y)){
+
+
+    varX <- df[,v3x]
+    varY <- df[,v3y]
+    ellipsePlot(varX, varY, alpha)
+  }
+  else{
+
+    blank<-data.frame("1"=c(1:10), "2"=c(1:10))
+    ggplot(data=blank, aes(x=1, y=2))+
+      theme_void()+
+      ggtitle("Pick 2 Different Variables")
+  }
+
+})
+
+output$chiPlots <- renderPlot({
+  df <- datNum()
+  v3x<-v3x()
+  v3y <- v3y()
+
+  if(input$data=="Upload_Your_Own"){
+    req(input$file)
+  }
+
+  req(input$alpha)
+
+  if(is.element(v3x, newNames()) & !identical(v3x, v3y)){
+
+
+    varX <- df[,v3x]
+    varY <- df[,v3y]
+    chiPlot(varX, varY)
+  }
+
+
+})
 
 
 

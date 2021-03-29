@@ -142,10 +142,13 @@ qqplot <- function(vec){
 }
 
 
-ellipse <- function(x,y, alpha=.05){
+ellipsePlot <- function(x,y, alpha=.05){
 
   df <- data.frame("x"=x, "y"=y)
   mat <- as.matrix(df, ncol=2)
+
+  df$x <- unlist(df$x)
+  df$y <- unlist(df$y)
 
   mu <- colMeans(df)
 
@@ -153,10 +156,16 @@ ellipse <- function(x,y, alpha=.05){
 
   eig <- eigen(s)
 
-  chi <- qchisq(alpha, 2, lower.tail = FALSE)
 
-  rmaj <- sqrt(eig$values[1]*chi)
-  rmin <- sqrt(eig$values[2]*chi)
+  chi <- as.numeric(qchisq(alpha, 2, lower.tail = FALSE))
+
+
+
+
+  rmaj <- as.numeric(sqrt(eig$values[1]*chi))
+
+
+  rmin <- as.numeric(sqrt(eig$values[2]*chi))
 
   ang <- 90-atan(eig$vectors[1,1]/eig$vectors[2,1])*180/pi
 
@@ -168,18 +177,45 @@ ellipse <- function(x,y, alpha=.05){
   ellpath <- ell$path()
   ellpath <- rbind(ellpath, ellpath[1,])
 
-  # p <- ggplot(as.data.frame(ellpath), aes(x=x, y=y))+
-  #   geom_path(color="red")+
-  #   theme_classic()
-  #
-  #
-  # suppressWarnings(p)
+  p <- ggplot(as.data.frame(ellpath), aes(x=x, y=y))+
+    geom_path(color="red")+
+    theme_classic()+
+    geom_point(data=df, aes(x=df[,1], y=df[,2]))+
+    ggtitle("Bivariate Scatter Plot")
 
-  # df <- as.data.frame(df)
-  # class(df)
 
-  p2 <- ggplot(data=df, aes(x=x, y=y))+
-    geom_point()
 
-  p2
+  suppressWarnings(p)
+
+
+}
+
+chiPlot <- function(x, y) {
+
+  df <- data.frame("x"=unlist(x), "y"=unlist(y))
+  n <- nrow(df)
+
+  s <- cov(df[,c(1,2)])
+  sInv <- solve(s)
+
+  means<-data.frame("x1"=df$x-mean(df$x), "x2"=df$y-mean(df$y))
+
+  multi<-c()
+  for(i in 1:n){
+    multi[i]=as.matrix(means[i,]) %*% sInv %*% t(as.matrix(means[i,]))
+  }
+
+  multi<-sort(multi)
+
+  chi_plot<-data.frame("j"=seq(1:n), "d2"=multi) %>%
+    mutate("q"=qchisq((j-0.5)/n, 2))
+
+  p <- ggplot(chi_plot, aes(x=q, y=d2))+
+    geom_point()+
+    theme_classic()+
+    xlab("Chi")+
+    ylab("Dist")+
+    ggtitle("Chi-Square Plot for Bivariate Data")
+
+  suppressWarnings(p)
 }
