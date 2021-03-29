@@ -15,4 +15,6 @@ Imports:
   shiny,
   shinyjs,
   dplyr,
-  ggplot2
+  ggplot2,
+  stats,
+  PlaneGeometry

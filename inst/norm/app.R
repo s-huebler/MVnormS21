@@ -6,6 +6,7 @@ library(shinyjs)
 library(dplyr)
 library(stats)
 library(ggplot2)
+library(PlaneGeometry)
 source("functions.R")
 
 # Built in example dataset ----
@@ -81,17 +82,39 @@ ui<-fluidPage(
     #Task 2 tab ----
     tabPanel( "Task 2",
       fluidRow(
-      column(3,class="round",
-             radioButtons("inRow2",
-                          "Select Task 2 Input",
-                          choices=c("g", "h", "i"))
-      ),
+        column(3,class="round",
+               radioButtons("vars2",
+                            "Select variable ",
+                            choices = c("x1", "x2", "x3", "x4", "dsq"))
+        ),
       column(9,
-             " Task 2 Output",
-             uiOutput("task2")
+             uiOutput("task2"),
+             plotOutput("qqPlots"),
+             uiOutput("rQ")
       )
     )#End fluid row
-  ) #End tab 2
+  ), #End tab 2
+
+  #Task 3 tab ----
+  tabPanel( "Task 3",
+            fluidRow(
+              column(3,class="round",
+                     radioButtons("vars3x",
+                                  "Select x variable ",
+                                  choices = c("x1", "x2", "x3", "x4", "dsq")),
+                     radioButtons("vars3y",
+                                  "Select y variable ",
+                                  choices = c("x1", "x2", "x3", "x4", "dsq")),
+                     textInput("alpha",
+                               "Pick an alpha value",
+                               value="0")
+
+              ),
+              column(9,
+                     uiOutput("task3"),
+              )
+            )#End fluid row
+  ) #End tab 3
 
   ) #End tabset panels
 ) #End fluid page
@@ -233,12 +256,117 @@ output$task1 <- renderUI({
 })
 
 
+#Task 2 Buttons Update ----
+
+#Updating variable
+observe({
+
+  temp<-as.vector(newNames())
+  updateRadioButtons(session, "vars2", choices=temp)
+
+})
 
 #Task 2 Output ----
-output$task2<-renderUI({
-  HTML("test2")
-  HTML("test2.2")
+
+v2 <- reactive({
+  input$vars2
 })
+
+
+output$task2<-renderUI({
+
+  title <- "QQ-Plot Test"
+
+  exp <- paste(
+    "The QQ plot measures the observed distribution of the data against a theoretical
+    normal distribution. If the points align along the 45 degree line then the observed
+    distribution follows a normal distribution. Deviations from the line indicate
+    deviation from normality."
+    , sep= " "
+  )
+
+  HTML( "<span style='font-size:150%'>", title, "</span>","<br>" ,
+        "<span style='font-size:80%'>", exp)
+
+})
+
+
+output$qqPlots <- renderPlot({
+  df <- datNum()
+  v2<-v2()
+
+  if(input$data=="Upload_Your_Own"){
+    req(input$file)
+  }
+
+  if(is.element(v2, newNames())){
+
+
+    var <- df[,v2]
+    qqplot(var)
+  }
+  else{
+
+    blank<-data.frame("1"=c(1:10), "2"=c(1:10))
+    ggplot(data=blank, aes(x=1, y=2))+
+      theme_void()
+  }
+
+})
+
+
+
+output$rQ <- renderUI({
+
+  df <- datNum()
+  v2<-v2()
+
+  if(input$data=="Upload_Your_Own"){
+    req(input$file)
+  }
+
+  if(is.element(v2, newNames())){
+
+    rq <- rQ(df[,v2])
+
+  val <- paste(
+    "The correlation coefficient of the QQ plot is", rq, sep=" "
+  )
+
+  HTML( "<span style='font-size:80%'>", val)
+
+
+  }
+})
+
+#Task 3 Buttons Update ----
+
+#Updating x variable
+observe({
+
+  temp<-as.vector(newNames())
+  updateRadioButtons(session, "vars3x", choices=temp)
+
+})
+
+observe({
+
+  temp<-as.vector(newNames())
+  updateRadioButtons(session, "vars3y", choices=temp)
+
+})
+
+v3x <- reactive({
+  input$vars3x
+})
+
+v3x <- reactive({
+  input$vars3y
+})
+
+# Task 3 Output ----
+
+
 
 }
 
