@@ -1,0 +1,59 @@
+---
+title: "Multivariate Normal Vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{MultivariateNormalVignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(MVnormS21)
+```
+
+
+The MVnormS21 package is designed to assist you with the assessment of multivariate normality. There are many statistical tests which assume multivariate normality, but (as you're about to see) multivariate normality is a big assumption!
+
+The MVnormS21 package houses the MVnorm( ) function. Once called, MVnorm( ) will launch an app in your browser. You can check out the app using the built in dataset or you can upload your own. The app accepts .xls or .csv files. If you do upload your own, make sure that it has at least 2 continuous variables. Beware, you may need to do some pre-processing. The app will automatically filter the data to take only numeric columns, but id columns or numeric factor/categorical columns will be kept as well. The data that you select will be displayed at the top of the page. 
+
+MVnorm( ) gives you 4 different ways to check your data for multivariate normality. 
+
+#Marginal Distribution and Proportion Test
+
+The first way is under the Task 1 tab. Here you will be able to visually asses the marginal distributions of your data. Pick your desired variable from the input side bar and the marginal distribution will be plotted. Lines to indicate the mean, first standard deviation range, and second standard deviation range will appear as well. Univariate normal data has a bellcurve shape, so a significant deviation will indicate that you might not have normality! Under the graph the results of the proportion test are displayed. The proportion test gives information about the shape of the tails of the distribution. If the tails are too thick or too thin, the test will result in failure. Underneath the result you can see the numerical proportion that falls within 1 or 2 standard deviations from the mean. If your data is normal, you expect those values to be around .68 and .95. 
+
+For a normal data set, we expect 68.3% of the values to fall within the interval $(\mu_i-\sqrt{\sigma_{11}}, \mu_i+\sqrt{\sigma_{11}})$ and 95.4% of the values to fall within the interval $(\mu_i-2\sqrt{\sigma_{11}}, \mu_i+2\sqrt{\sigma_{11}})$. Therefore, if the difference between the proportion of values that fall outside of that range and .683 or .954 respectively is greater than $3\sqrt{\frac{pq}{n}}$ where $p=.683, .954$ and $q=1-p$, we suspect deviation from normality. 
+
+#QQ-plot and Shapiro Test
+
+The second way that MVnorm( ) allows you to check for normality is with the QQ-plot. This test too will check for univariate normality of each variable. The QQ plot measures the observed distribution of the data against a theoretical normal distribution. If the points align along the 45 degree line then the observed distribution follows a normal distribution. Deviations from the line indicate deviation from normality. If the data is normal, then the correlation coefficient between the observed and theoretical distributions will be high. 
+
+Underneath the QQ-plot the result of a shapiro wilks test is given. A shapiro wilks test assumes normality, so a high p-value indicates normality and a small p-value indicated non-normality.
+
+#Bivariate Normality
+
+MVnorm() provides 2 different graphs to assess bivariate normality. You can pick any 2 continuous variables to check for normality with. Make sure the variables are different. A bivariate scatter plot will show the distribution of the 2 different variables. The ellipse around the points encloses (1-$\alpha$)% of the data. The angle and size of the ellipse is found using the covariance matrix of bivariate data. The size of the major axis is given by $\sqrt{\lambda_1*\chi_2^2(\alpha)}$ and the size of the minor axis is given by $\sqrt{\lambda_2*\chi_2^2(\alpha)}$ where $\lambda_{1,2}$ are the eigenvalues of the covariance matrix. The axes are positioned in the direction of the corresponding eigenvectors. 
+
+The chi-square plot for bivariate data calculates bivariate chi square distance. The distance is calculated by first ordering each point. Then the value of the generalized sqare distance is calculated according to the following formula 
+$$
+d^2_j=(\pmatrix{x_1\\x_2}-\pmatrix{\bar{x}_1\\ \bar{x}_2})'S^{-1}(\pmatrix{x_1\\x_2}-\pmatrix{\bar{x}_1\\ \bar{x}_2})
+$$
+Then for each of the $j$ points, we find $q$ where $q=\chi_2^2((j-.05)/n)$. Then the ordered pairs $(q_j, d_j)$. The largest values may be outliers. 
+
+#Abnormal Values
+
+MVnorm( ) shows a table of the original data alongside the standardized data. A large absolute value of a standardized score in any column may indicate deviation from normality. At the rightmost end of the data table you can see the generalized sqare distance where all of the data columns are used. The distance is calculated according to the generalization of the previous formula:
+
+$$
+d^2_j=(\textbf x_j -\bar{\textbf x}_j)'S^{-1}(\textbf x_j -\bar{\textbf x}_j)
+$$
+Here each $\textbf x_j$ reprsents the j$^{th}$ row of the original data frame. If the original data frame if $p$ by $n$, then $\textbf x_j$ has dimension $p$ by $1$. 
+
+

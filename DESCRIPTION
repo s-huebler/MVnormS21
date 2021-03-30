@@ -18,3 +18,7 @@ Imports:
   ggplot2,
   stats,
   PlaneGeometry
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
