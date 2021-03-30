@@ -219,3 +219,38 @@ chiPlot <- function(x, y) {
 
   suppressWarnings(p)
 }
+
+outDet <- function(df) {
+
+  n <- nrow(df)
+  name <- names(df)
+  s <- cov(df)
+  sInv <- solve(s)
+
+  #means<-matrix(colMeans(df), ncol=1)
+  meanCorrect <- as.data.frame(apply(df, 2, FUN= function(x){scale(x, center=TRUE, scale=FALSE)}))
+
+  multi<-c()
+  for(i in 1:n){
+    multi[i]=as.matrix(meanCorrect[i,]) %*% sInv %*% t(as.matrix(meanCorrect[i,]))
+  }
+
+
+  d2 <- as.data.frame(multi)
+  names(d2) <- "d2"
+
+
+  z <- as.data.frame(apply(df, 2, FUN= function(x){scale(x)}))
+    temp<-c()
+    for(j in 1:ncol(df)){
+      temp[j]<-paste("z", name[j], sep="")
+    }
+
+    names(z) <- temp
+
+
+    final <- cbind(df,z)
+    final <- cbind(final, d2)
+    final
+}
+

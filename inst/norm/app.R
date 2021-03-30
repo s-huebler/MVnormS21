@@ -116,7 +116,24 @@ ui<-fluidPage(
                      plotOutput("chiPlots")
               )
             )#End fluid row
-  ) #End tab 3
+  ), #End tab 3
+
+  #Task 4 tab ----
+  tabPanel( "Task 4",
+            fluidRow(
+              column(3,class="round",
+                     radioButtons("vars4",
+                                  "Select x variable ",
+                                  choices = c("x1", "x2", "x3", "x4", "dsq")),
+
+              ),
+              column(9,
+                     uiOutput("task4"),
+                     tableOutput("zScore")
+
+              )
+            )#End fluid row
+  ) #End tab 4
 
   ) #End tabset panels
 ) #End fluid page
@@ -441,7 +458,27 @@ output$chiPlots <- renderPlot({
 
 })
 
+# Task 4 ----
+output$task4 <- renderUI({
 
+  title <- "Look for Abnormal Values"
+
+  exp <- paste(
+    "Alongside the original data frame we have the standardized scores and the
+    chi-square distance. We can look for abnormal values (for distance think large,
+    for standardized scores think large absolute value) to detect outliers.", sep= " "
+  )
+
+  HTML( "<span style='font-size:150%'>", title, "</span>","<br>" ,
+        "<span style='font-size:80%'>", exp)
+
+})
+
+output$zScore <- renderTable({
+  df <- datNum()
+  table <- outDet(df)
+
+})
 
 }
 
